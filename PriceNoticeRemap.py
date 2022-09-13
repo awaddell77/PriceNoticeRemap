@@ -24,9 +24,9 @@ loc_map = {
 "NORTH POLE TSO NET": "FAIRBANKS" }
 
 branded_loc_map = {
-"ANCHORAGE T3 TSO NET":"b",
-"ANCHORAGE T2 TSO NET":"b", 
-"NORTH POLE TSO NET":"b"
+"ANCHORAGE T3 TSO NET":"B",
+"ANCHORAGE T2 TSO NET":"B", 
+"NORTH POLE TSO NET":"B"
 }
 unbranded_prod_filter_by_loc = {"ANC": ("UNL 87","UNL 88.5","UNL 90","#1ULSD C","#2ULSD C","KERO","JET A"),
 "FAIRBANKS": ("UNL 87","UNL 88.5","UNL 90","#1ULSD C","#2ULSD C","KERO","JET A"),
@@ -49,8 +49,8 @@ def product_remap(product_name):
 	for combo in itertools.product(locs, prods):
 		#itertools creates a cartesian product of locs and prods
 		#print(combo)
-		if combo[1]  not in prod_filter and combo[1] in unbranded_prod_filter_by_loc[combo[0]]: unbranded_prods.append(list(combo)+["u"])
-		if combo[1] not in prod_filter and combo[1] in branded_prod_filter_by_loc[combo[0]]: branded_prods.append(list(combo)+ ["b"])
+		if combo[1]  not in prod_filter and combo[1] in unbranded_prod_filter_by_loc[combo[0]]: unbranded_prods.append(list(combo)+["U"])
+		if combo[1] not in prod_filter and combo[1] in branded_prod_filter_by_loc[combo[0]]: branded_prods.append(list(combo)+ ["B"])
 
 	return (unbranded_prods, branded_prods)
 
@@ -68,11 +68,6 @@ def remap_pn(fname):
 	for i in range(0, len(dlst)):
 		for i_2 in range(0, len(pn_datafile)):
 			pn_row = pn_datafile.get_index(i_2)
-			if dlst[i]['Location'] == 'ANC' and dlst[i]["TesProduct"] == 'UNL87' and "Anchorage" in pn_row['Terminal'] : 
-				print(dlst[i])
-				print(pn_row)
-				print("Location:", dlst[i]["Location"] == loc_map[pn_row["Terminal"]] )
-				print("Product: ", dlst[i]['TesProduct'] ==prod_map[pn_row['Commodity Abbreviation']] )
 			if check_rows(pn_row, dlst[i]):
 				#print(dlst[i]["Location"], dlst[i]['TesProduct'], "vs", pn_row["Terminal"], pn_row["Commodity Abbreviation"])
 				#print("{0} is dlist, {1} is pn_row".format(dlst[i]["Price"],pn_row["Price"] ))
@@ -81,7 +76,7 @@ def remap_pn(fname):
 				if dlst[i]['Price'] != -100 and float(pn_row['Price']) != float(dlst[i]['Price']) : raise RuntimeError("Possible Discrepancy Between Marathon Locations in {0} for {1}. Price: {2} ".format(dlst[i]['Location'], dlst[i]['TesProduct'], pn_row["Price"])) 
 				dlst[i]['Price'] = pn_row['Price']
 				dlst[i]['Date_daily'] = pn_row['Effective DateTime']
-				if dlst[i]['Brand Indicator'] == 'b': dlst[i]['Tca'] = .05
+				if dlst[i]['Brand Indicator'] == 'B': dlst[i]['Tca'] = .05
 	return dlst
 def check_rows(pn_row, default_row):
 	return (default_row['Location'] == loc_map[pn_row["Terminal"]] and default_row['TesProduct'] == prod_map[pn_row['Commodity Abbreviation']] and default_row["Brand Indicator"] == branded_loc_map.get(pn_row['Terminal'],'u'))
@@ -94,7 +89,7 @@ def dict_defaults(unbr, branded, crit=[]):
 	for i in range(0, len(temp_arr)):
 		#print(temp_arr[i])
 		#print(len(temp_arr[i]))
-		d = {'TesID':'', 'Location':temp_arr[i][0], 'TesProduct':temp_arr[i][1], 'Brand Indicator':temp_arr[i][2], 'TesDesignation':'Tesoro','Price':-100, 'Tca': 0.05 if temp_arr[i][2] == 'b' else 0.0, 'Date_daily':'', 'OPISProcess':0}
+		d = {'TesID':'', 'Location':temp_arr[i][0], 'TesProduct':temp_arr[i][1], 'Brand Indicator':temp_arr[i][2], 'TesDesignation':'Marathon','Price':-100, 'Tca': 0.05 if temp_arr[i][2] == 'B' else 0.0, 'Date_daily':'', 'OPISProcess':0}
 		dlst.append(copy.deepcopy(d))
 	print("Dlst:\n",dlst)
 	return dlst
@@ -103,7 +98,7 @@ def dict_defaults(unbr, branded, crit=[]):
 
 
 
-tst_data_fname = "Price_Notice_2022_4_15_17_14_19.csv"
+tst_data_fname = "Price_Notice_2022_5_3_22_27_30.csv"
 #pn_data = import_price_notification(tst_data_fname)
 #print(loc_map)
 #print(prod_map)
